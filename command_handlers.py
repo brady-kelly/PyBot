@@ -22,3 +22,10 @@ class BotCommandHandler:
 
         response = random.choice(brooklyn_99_quotes)
         await ctx.send(response)
+        
+    async def roll(self, ctx, number_of_dice, number_of_sides):
+        dice = [
+            str(random.choice(range(1, number_of_sides + 1)))
+            for _ in range(number_of_dice)
+        ]
+        await ctx.send(', '.join(dice))

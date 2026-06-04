@@ -23,13 +23,13 @@ comms = BotCommandHandler(GUILD, bot)
 async def on_ready():
     comms.onReady()
 
-@bot.command(name='99')
+@bot.command(name='99', help='Responds with a random quote from Brooklyn 99')
 async def nine_nine(ctx):
     print("command")
     await comms.nineNine(ctx)
     
-# @client.event
-# async def on_error(event, *args, **kwargs):
-#     await handler.onError(event, args, kwargs)
+@bot.command(name='roll', help='Simulates rolling dice.')
+async def roll(ctx, number_of_dice: int, number_of_sides: int):
+    await comms.roll(ctx, number_of_dice, number_of_sides)
 
 bot.run(TOKEN)
