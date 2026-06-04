@@ -11,6 +11,7 @@ GUILD = os.environ['DISCORD_GUILD']
 
 intents = discord.Intents.default()
 intents.members = True
+intents.message_content = True
 
 client = discord.Client(intents=intents)
 
@@ -36,6 +37,7 @@ async def on_member_join(member):
 
 @client.event
 async def on_message(message):
+    print("onmessage")
     if message.author == client.user:
         return
 
@@ -49,6 +51,7 @@ async def on_message(message):
     ]
 
     if message.content == '99!':
+        print("99 messages")
         response = random.choice(brooklyn_99_quotes)
         await message.channel.send(response)
 
