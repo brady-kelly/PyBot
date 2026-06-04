@@ -1,11 +1,11 @@
 # bot.py
 import os
 import random
-
 import discord
 from dotenv import load_dotenv
-
-from handlers import ClientEventHandler
+from command_handlers import BotCommandHandler
+from event_handlers import ClientEventHandler
+from discord.ext import commands
 
 load_dotenv()
 TOKEN = os.environ['DISCORD_TOKEN']
@@ -15,23 +15,21 @@ intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 
-client = discord.Client(intents=intents)
-handler = ClientEventHandler(GUILD, client)
+bot = commands.Bot(command_prefix='!', intents=intents)
 
-@client.event
+comms = BotCommandHandler(GUILD, bot)
+
+@bot.event
 async def on_ready():
-    handler.onReady()
-        
-@client.event
-async def on_member_join(member):
-    await handler.onMemberJoin(member)
+    comms.onReady()
 
-@client.event
-async def on_message(message):
-    await handler.onMessage(message)
+@bot.command(name='99')
+async def nine_nine(ctx):
+    print("command")
+    await comms.nineNine(ctx)
     
-@client.event
-async def on_error(event, *args, **kwargs):
-    await handler.onError(event, args, kwargs)
+# @client.event
+# async def on_error(event, *args, **kwargs):
+#     await handler.onError(event, args, kwargs)
 
-client.run(TOKEN)
+bot.run(TOKEN)
