@@ -27,7 +27,6 @@ class ClientEventHandler:
         print(f'{member.name}, has joined!')
         
     async def onMessage(self, message):
-        print("onmessage")
         if message.author == self.client.user:
             return
 
@@ -41,6 +40,14 @@ class ClientEventHandler:
         ]
 
         if message.content == '99!':
-            print("99 messages")
             response = random.choice(brooklyn_99_quotes)
-            await message.channel.send(response)        
+            await message.channel.send(response)   
+        elif message.content == 'raise-exception':
+            raise discord.DiscordException     
+        
+    async def onError(self, event, *args, **kwargs):
+        with open('err.log', 'a') as f:
+            if event == 'on_message':
+                f.write(f'Unhandled message: {args[0]}\n')
+            else:
+                raise

@@ -29,5 +29,9 @@ async def on_member_join(member):
 @client.event
 async def on_message(message):
     await handler.onMessage(message)
+    
+@client.event
+async def on_error(event, *args, **kwargs):
+    await handler.onError(event, args, kwargs)
 
 client.run(TOKEN)
