@@ -1,46 +1,36 @@
-# bot.py
 import os
-import random
+
 import discord
-from dotenv import load_dotenv
-from command_handler import BotCommandHandler
-from error_handler import BotErrorHandler
-from event_handlers import ClientEventHandler
 from discord.ext import commands
+from dotenv import load_dotenv
+
+from bot_event_handler import BotEventHandler
+from hybrid_commands import HybridCommands
 
 load_dotenv()
+
 TOKEN = os.environ['DISCORD_TOKEN']
-GUILD = os.environ['DISCORD_GUILD']
 
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"), intents=discord.Intents.all())
 
-comms = BotCommandHandler(GUILD, bot)
-errs = BotErrorHandler(GUILD, bot)
+events = BotEventHandler(bot)
+hybrid = HybridCommands(bot)
+
+async def setup_hook() -> None:  
+    await bot.tree.sync()   
+
+bot.setup_hook = setup_hook 
 
 @bot.event
-async def on_ready():
-    comms.onReady()
+async def on_ready() -> None:
+    await events.onReady()
 
-@bot.command(name='99', help='Responds with a random quote from Brooklyn 99')
-async def nine_nine(ctx):
-    print("command")
-    await comms.nineNine(ctx)
+@bot.hybrid_command()
+async def ping(ctx: commands.Context) -> None:  
+    await hybrid.ping(ctx)
     
-@bot.command(name='roll', help='Simulates rolling dice.')
-async def roll(ctx, number_of_dice: int, number_of_sides: int):
-    await comms.roll(ctx, number_of_dice, number_of_sides)
-    
-@bot.command(name='create-channel')
-@commands.has_role('admin')
-async def create_channel(ctx, channel_name=''):
-    await comms.createChannel(ctx, channel_name)
-        
-@bot.event
-async def on_command_error(ctx, error):
-    await errs.onCommandError(ctx, error)       
-
 bot.run(TOKEN)
