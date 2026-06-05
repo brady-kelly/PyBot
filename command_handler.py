@@ -1,5 +1,5 @@
 import random
-
+import discord
 
 class BotCommandHandler:
     
@@ -29,3 +29,13 @@ class BotCommandHandler:
             for _ in range(number_of_dice)
         ]
         await ctx.send(', '.join(dice))
+        
+    async def createChannel(self, ctx, channel_name):
+        if channel_name == '':
+            await ctx.send('Channel name is missing')
+            return
+        guild = ctx.guild
+        existing_channel = discord.utils.get(guild.channels, name=channel_name)
+        if not existing_channel:
+            print(f'Creating a new channel: {channel_name}')
+            await guild.create_text_channel(channel_name)                        

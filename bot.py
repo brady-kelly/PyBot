@@ -3,7 +3,8 @@ import os
 import random
 import discord
 from dotenv import load_dotenv
-from command_handlers import BotCommandHandler
+from command_handler import BotCommandHandler
+from error_handler import BotErrorHandler
 from event_handlers import ClientEventHandler
 from discord.ext import commands
 
@@ -18,6 +19,7 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 comms = BotCommandHandler(GUILD, bot)
+errs = BotErrorHandler(GUILD, bot)
 
 @bot.event
 async def on_ready():
@@ -32,18 +34,13 @@ async def nine_nine(ctx):
 async def roll(ctx, number_of_dice: int, number_of_sides: int):
     await comms.roll(ctx, number_of_dice, number_of_sides)
     
-@bot.command(name='channel-new')
+@bot.command(name='create-channel')
 @commands.has_role('admin')
-async def create_channel(ctx, channel_name='newchan'):
-    guild = ctx.guild
-    existing_channel = discord.utils.get(guild.channels, name=channel_name)
-    if not existing_channel:
-        print(f'Creating a new channel: {channel_name}')
-        await guild.create_text_channel(channel_name)    
+async def create_channel(ctx, channel_name=''):
+    await comms.createChannel(ctx, channel_name)
         
 @bot.event
 async def on_command_error(ctx, error):
-    if isinstance(error, commands.errors.CheckFailure):
-        await ctx.send('You do not have the correct role for this command.')        
+    await errs.onCommandError(ctx, error)       
 
 bot.run(TOKEN)
